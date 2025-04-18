@@ -6,15 +6,23 @@
   import Footer from '../lib/footer.svelte';
   import PreeFooter from '../lib/prefooter.svelte'
   import Prefooter from '../lib/prefooter.svelte';
-  import Navigationbar from '../lib/navigationbar.svelte'
+  import Navigationbar from '../lib/navigationbar.svelte';
+  
+  export let showNavigation = true;
+
+  
+  
 
   export let data; // Receive isAuthenticated from load
   let isAuthenticated = data.isAuthenticated;
 </script>
 <Header isAuthenticated={data.isAuthenticated} username={data.username} />
 
-<slot />
+<slot {showNavigation}/>
+{#if showNavigation}
 <Navigationbar/>
+{/if}
+
 <Prefooter/>
 <Footer/>
 

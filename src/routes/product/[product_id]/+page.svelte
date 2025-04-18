@@ -1,8 +1,11 @@
 
 <script>
+  
     
     import Fullviewproduct from "../../../lib/fullviewproduct.svelte";
     import Recentlyview from "../../../lib/recentlyview.svelte";
+
+      export const showNavigation = false;
   
 
     

@@ -587,20 +587,24 @@
     font-size: 16px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    width: 100%;
+    justify-content: space-between;
   }
   .desc-reviewbtn {
     border: none;
     background-color: transparent;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 500;
     line-height: 30px;
     color: rgb(136, 134, 134);
+    
+  
   }
   .desc-reviewctn {
     font-weight: 400;
     line-height: 24px;
     color: rgb(0, 0, 0);
+    margin-top: 10px;
   }
   .desc-reviewbtn.active {
     color: black;
@@ -609,7 +613,6 @@
     border-bottom: 1px solid lightgray;
     padding-bottom: 4px;
     display: flex;
-    gap: 15px;
     box-sizing: border-box;
   }
   .farleft {
@@ -849,6 +852,7 @@
     font-weight: 500;
     line-height: 25px;
     color: rgb(136, 134, 134);
+    padding: 0px;
   }
   .btn-section {
     gap: 2px;

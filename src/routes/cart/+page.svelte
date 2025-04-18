@@ -3,6 +3,7 @@
   import { browser } from "$app/environment";
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
+  import Cartadd from "../../lib/cartadd.svelte";
   
   import {openProductPage} from "../../lib/productutil.js";
 
@@ -177,6 +178,7 @@
 
  
 </script>
+
 
 
 {#if error}

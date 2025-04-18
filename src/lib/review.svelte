@@ -206,16 +206,18 @@
         </div>
         <div>
           <p>{review.comment}</p>
-          <p class="date">{new Date(review.created_at).toLocaleDateString()}</p>
+         
 
           <!-- Toggle button - shows/hides both replies and reply form -->
+           <div class="reply-bottom">
+            
           <button
             class="reply-btn"
             class:active={activeTab === review.review_id}
             on:click={() => toggleReplies(review.review_id)}
-          >
+          ><Icon icon="lsicon:down-filled"/>
             {activeTab === review.review_id ? "Hide Replies" : "Show Replies"}
-          </button>
+          </button><p class="date">{new Date(review.created_at).toLocaleDateString()}</p></div>
 
           <!-- Only show replies and reply form when this review is active -->
           {#if activeTab === review.review_id}
@@ -297,8 +299,8 @@
 
 <style>
   .review-section {
-    padding: 10px 10px;
     box-sizing: border-box;
+    max-width: 100%;
   }
   .title {
     font-size: 20px;
@@ -313,6 +315,7 @@
     gap: 0.5rem;
     margin: 1rem 0;
     padding: 1rem;
+    box-sizing: border-box;
     background: #f8f9fa;
     border-radius: 4px;
   }
@@ -321,6 +324,7 @@
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
   }
   button {
     padding: 0.5rem 1rem;
@@ -329,6 +333,7 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+
   }
   button:disabled {
     background-color: #6c757d;
@@ -347,7 +352,7 @@
     flex-direction: row;
     gap: 9px;
     align-items: center;
-   
+    
   }
   
   .reviewname{
@@ -367,6 +372,22 @@
     border-left: 2px solid #ccc;
     padding-left: 1rem;
     margin-top: 0.5rem;
+    box-sizing: border-box;
+  }
+  .reply-bottom{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+   
+  }
+  .reply-btn{
+   margin-bottom: 5px;
+   border: none;
+   background-color: white;
+   color:#1a4845;
+
+   
+
   }
   .date {
     font-size: 0.8rem;
@@ -376,7 +397,7 @@
   .rating-container {
     display: flex;
     flex-direction: row;
-    gap: 40px;
+    
     margin-bottom: 2rem;
    
   }
@@ -387,6 +408,7 @@
   .rating-row {
     display: flex;
     align-items: center;
+    flex: 0 0 30%;
   }
   .rating-number {
     font-size: 72px;
@@ -397,7 +419,8 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    width: fit-content;
+    width: 100%;
+    flex: 0 0 70%;
   }
   .bar-row {
     display: flex;
@@ -409,8 +432,30 @@
     text-align: right;
   }
   .bar {
-    width: 160px;
+    width: 40%;
     height: 8px;
     background-color: #ccc;
+  }
+  @media (max-width:768px){
+
+    .rating-container{
+      flex-direction: column;
+      gap: 30px;
+    }
+    .title{
+      margin-bottom: 30px;
+    }
+    .rating-bars{
+      flex: 0 0 100%;
+    }
+    .bar-row{
+      align-items: flex-start;
+      justify-content: flex-start;
+
+    }
+    
+    .bar{
+      width: 80%;
+    }
   }
 </style>
