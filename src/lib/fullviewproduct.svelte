@@ -6,7 +6,7 @@
   import { onMount, beforeUpdate } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
-  import {page} from '$app/stores';
+  import { page } from "$app/stores";
   import Review from "./review.svelte";
 
   export let product = {
@@ -34,8 +34,10 @@
     productsizes,
     product_id,
     review_count,
-    average_rating
+    average_rating,
   } = product;
+  export let isAuthenticated = false;
+  export let pendingWishlistItem = null;
 
   let currentIndex = 0;
   let activeTab = "desc";
@@ -45,7 +47,7 @@
   let dialog;
   let message;
   let imessage;
-  
+ 
 
   // Safe cart access
   function getCart() {
@@ -134,7 +136,7 @@
 
     if (currentQty >= sizeObj.stock_quantity) {
       message = `Only ${sizeObj.stock_quantity} ${sizeObj.size} available in stock`;
-      setTimeout(() => (message = ""),1500);
+      setTimeout(() => (message = ""), 1500);
       return;
     }
 
@@ -235,12 +237,72 @@
       window.dispatchEvent(new Event("cartUpdated"));
     }
   }
+  $: {
+    if (browser && isAuthenticated && pendingWishlistItem) {
+      console.log("Processing pending wishlist item:", pendingWishlistItem);
+      handlePendingWishlistItem(pendingWishlistItem);
+    }
+  }
+
+  async function handlePendingWishlistItem(productId) {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/wishlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`
+        },
+        body: JSON.stringify({ product_id: productId })
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("wishlistPending");
+        imessage = "Product added to wishlist";
+      } else {
+        message = "Failed to add to wishlist";
+      }
+    } catch (error) {
+      message = "Error processing wishlist";
+    }
+  }
+
+  async function addToWishlist(productId = product.product_id) {
+    if (!browser) return;
+
+    if (!isAuthenticated) {
+      localStorage.setItem("wishlistPending", productId);
+      goto(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+      return;
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/wishlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`
+        },
+        body: JSON.stringify({ product_id: productId })
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        imessage = result.message || "Added to wishlist";
+      } else {
+        message = result.message || "Failed to add to wishlist";
+      }
+    } catch (error) {
+      message = "Network error occurred";
+    }
+  }
 </script>
+
 {#if imessage}
-<div class="imessage">{imessage}</div>
+  <div class="imessage">{imessage}</div>
 {/if}
 {#if message}
-<div class="stockermessage">{message}</div>
+  <div class="stockermessage">{message}</div>
 {/if}
 
 {#if product && product.product_id}
@@ -301,7 +363,6 @@
         </div>
       </div>
       {#if productsizes.length === 1}
-     
         <div class="check">
           <div class="arithmetical">
             <button on:click={decrementQuantityLegacy} role>-</button>
@@ -320,7 +381,7 @@
       {/if}
 
       <div class="xtra">
-        <button class="extra">
+        <button class="extra" on:click={() => addToWishlist()}>
           <span><Icon icon="ph:heart-thin" /></span>Add to wishlist
         </button>
         <button class="extra">
@@ -413,7 +474,7 @@
         {productdescriptions[0]?.additional_information || "No additional info"}
       </div>
     {:else}
-      <Review {product_id}{average_rating}{review_count}{productname}/>
+      <Review {product_id} {average_rating} {review_count} {productname} />
     {/if}
   </div>
 </div>
@@ -428,17 +489,16 @@
     text-align: center;
     width: 100%;
   }
-  .imessage{
+  .imessage {
     z-index: 2000;
     background-color: green;
     color: white;
     font-size: 22px;
     line-height: 34px;
     text-align: center;
-    width: 100%
-
+    width: 100%;
   }
-  .stockermessage{
+  .stockermessage {
     z-index: 2000;
     background-color: orangered;
     color: white;
@@ -446,7 +506,6 @@
     line-height: 34px;
     text-align: center;
     width: 100%;
-
   }
   .product-container {
     padding: 10px 20px;
@@ -597,8 +656,6 @@
     font-weight: 500;
     line-height: 30px;
     color: rgb(136, 134, 134);
-    
-  
   }
   .desc-reviewctn {
     font-weight: 400;
@@ -803,59 +860,58 @@
       height: 100%;
       padding-left: 5px;
       background-color: transparent;
-      
+
       padding: 0px 5px;
       align-items: center;
       box-sizing: border-box;
     }
-    .stockermessage{
+    .stockermessage {
       position: fixed;
       bottom: 7%;
       width: 100%;
     }
-    .imessage{
+    .imessage {
       position: fixed;
       bottom: 7%;
       width: 100%;
-
     }
-  
-  .thumbnails button {
-    height: 58px;
-    width: 58px;
-    box-sizing: border-box;
-  }
 
-  .thumbnails button img {
-    height: 58px;
-    width: 58px;
+    .thumbnails button {
+      height: 58px;
+      width: 58px;
+      box-sizing: border-box;
+    }
+
+    .thumbnails button img {
+      height: 58px;
+      width: 58px;
+    }
+    .main-image {
+      width: 100%;
+      height: auto;
+      max-height: 570px;
+      object-fit: scale-down;
+    }
+    .main-image img {
+      width: 100%;
+      height: auto;
+      max-height: 570px;
+      border: 1px solid gray;
+    }
+    .desc-review {
+      box-sizing: border-box;
+    }
+    .desc-reviewbtn {
+      border: none;
+      background-color: transparent;
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 25px;
+      color: rgb(136, 134, 134);
+      padding: 0px;
+    }
+    .btn-section {
+      gap: 2px;
+    }
   }
-  .main-image {
-    width: 100%;
-    height: auto;
-    max-height: 570px;
-    object-fit: scale-down;
-  }
-  .main-image img {
-    width: 100%;
-    height: auto;
-    max-height: 570px;
-    border: 1px solid gray;
-  }
-  .desc-review {
-    box-sizing: border-box;
-  }
-  .desc-reviewbtn {
-    border: none;
-    background-color: transparent;
-    font-size: 17px;
-    font-weight: 500;
-    line-height: 25px;
-    color: rgb(136, 134, 134);
-    padding: 0px;
-  }
-  .btn-section {
-    gap: 2px;
-  }
-}
 </style>

@@ -1,36 +1,37 @@
-
 <script>
-  
+  import Fullviewproduct from "../../../lib/fullviewproduct.svelte";
+  import Recentlyview from "../../../lib/recentlyview.svelte";
+  import { onMount } from 'svelte';
+
+  export const showNavigation = false;
+
+  // Single data prop that contains everything
+  export let data ;
+
+  onMount(() => {
+    console.log("Mounted with:", {
+      isAuthenticated: data.isAuthenticated,
+       pendingWishlistItem: data.pendingWishlistItem
+       
+    });
     
-    import Fullviewproduct from "../../../lib/fullviewproduct.svelte";
-    import Recentlyview from "../../../lib/recentlyview.svelte";
-
-      export const showNavigation = false;
-  
-
     
     
+  });
 
-    export let data;
-    let product = data.product;
-
-    $: if (product){
-      console.log("Product received:", product);
-    }
+  $: if (data.product) {
+    console.log("Product received:", data.product);
+  }
 </script>
 
-    
-  
-  {#if product}
-    <Fullviewproduct {product}/>
-    
-  {:else if product === null}
-    <p>Product not found.</p>
-    {:else}
-    <p>Loading product</p>
-  {/if}
-  
-  
-
-
-
+{#if data.product}
+  <Fullviewproduct 
+    product={data.product} 
+    isAuthenticated={data.isAuthenticated} 
+    pendingWishlistItem={data.pendingWishlistItem} 
+  />
+{:else if data.product === null}
+  <p>Product not found.</p>
+{:else}
+  <p>Loading product</p>
+{/if}

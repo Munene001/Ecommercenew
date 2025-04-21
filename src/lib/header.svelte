@@ -5,7 +5,7 @@
   import { openProductPage } from "./productutil";
   import CartHeader from "./cartHeader.svelte";
   import Accountmodal from "./accountmodal.svelte";
-  import WishlistHeader from "./wishlistHeader.svelte";
+  import Wishlistheader from "./wishlistheader.svelte";
 
   export let isAuthenticated = false;
   export let username = null;
@@ -216,7 +216,7 @@
     </div>
   </div>
   <div class="right">
-    <WishlistHeader />
+    <Wishlistheader />
     <CartHeader />
     <Accountmodal 
     {isAuthenticated} 
