@@ -5,6 +5,7 @@
   
   
   import Icon from "@iconify/svelte";
+  import { initializeAuth } from "../../stores/auth";
 
   let email = "";
   let password = "";
@@ -40,6 +41,7 @@
         const data = await response.json();
         if (browser) {
           localStorage.setItem("authToken", data.token);
+          initializeAuth(data.token, data.username)
           sessionStorage.removeItem('originalRedirect');
           const target = redirectTo.startsWith("/") ? redirectTo : "/account";
           if (redirectTo) {

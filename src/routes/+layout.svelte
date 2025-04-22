@@ -7,16 +7,20 @@
   import PreeFooter from '../lib/prefooter.svelte'
   import Prefooter from '../lib/prefooter.svelte';
   import Navigationbar from '../lib/navigationbar.svelte';
+  import {authStore} from '../stores/auth';
+  import {validateAuth} from '../stores/auth';
+
+
+  
   
   export let showNavigation = true;
 
   
-  
 
-  export let data; // Receive isAuthenticated from load
-  let isAuthenticated = data.isAuthenticated;
+
+
 </script>
-<Header isAuthenticated={data.isAuthenticated} username={data.username} />
+<Header/>
 
 <slot {showNavigation}/>
 {#if showNavigation}

@@ -6,9 +6,17 @@
   import CartHeader from "./cartHeader.svelte";
   import Accountmodal from "./accountmodal.svelte";
   import Wishlistheader from "./wishlistheader.svelte";
+  import { authStore } from "../stores/auth";
 
-  export let isAuthenticated = false;
-  export let username = null;
+  let isAuthenticated = false;
+  let username = null;
+  let isLoading = true;
+
+  authStore.subscribe(({ isAuthenticated: auth, username : name, isLoading }) => {
+    isAuthenticated = auth;
+    username = name || null;
+    
+  });
 
   function navigateToAccount() {
     goto("/account");
@@ -218,11 +226,7 @@
   <div class="right">
     <Wishlistheader />
     <CartHeader />
-    <Accountmodal 
-    {isAuthenticated} 
-    {username} 
-  />
-    
+    <Accountmodal {isAuthenticated} {username} />
   </div>
 </div>
 <div class="route">
@@ -467,8 +471,6 @@
     font-size: 20px;
     margin-left: 5px;
   }
-
-
 
   .route {
     height: 56px;

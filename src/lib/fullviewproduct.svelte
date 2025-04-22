@@ -6,8 +6,9 @@
   import { onMount, beforeUpdate } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
-  import { page } from "$app/stores";
+  import { page } from "$app/navigation";
   import Review from "./review.svelte";
+  import {authStore} from "../stores/auth"
 
   export let product = {
     productname: "",
@@ -36,8 +37,7 @@
     review_count,
     average_rating,
   } = product;
-  export let isAuthenticated = false;
-  export let pendingWishlistItem = null;
+ 
 
   let currentIndex = 0;
   let activeTab = "desc";
@@ -47,6 +47,12 @@
   let dialog;
   let message;
   let imessage;
+  let isAuthenticated = false;
+  let isLoading = true;
+
+  authStore.subscribe(({isAuthenticated: auth}) =>{
+    isAuthenticated = auth;
+  });
  
 
   // Safe cart access
@@ -237,65 +243,40 @@
       window.dispatchEvent(new Event("cartUpdated"));
     }
   }
-  $: {
-    if (browser && isAuthenticated && pendingWishlistItem) {
-      console.log("Processing pending wishlist item:", pendingWishlistItem);
-      handlePendingWishlistItem(pendingWishlistItem);
-    }
-  }
-
-  async function handlePendingWishlistItem(productId) {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/wishlist", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`
-        },
-        body: JSON.stringify({ product_id: productId })
-      });
-
-      if (response.ok) {
-        localStorage.removeItem("wishlistPending");
-        imessage = "Product added to wishlist";
-      } else {
-        message = "Failed to add to wishlist";
-      }
-    } catch (error) {
-      message = "Error processing wishlist";
-    }
-  }
-
-  async function addToWishlist(productId = product.product_id) {
-    if (!browser) return;
-
-    if (!isAuthenticated) {
-      localStorage.setItem("wishlistPending", productId);
-      goto(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+  async function addToWishlist(){
+    if(!isAuthenticated){
+      const redirectUrl = `/login?redirect =${encodeURIComponent($page.url.pathname)}`;
+      goto(redirectUrl);
       return;
     }
-
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/wishlist", {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch ("http://127.0.0.1:8000/api/wishlist",{
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`
+        headers:{
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ product_id: productId })
-      });
+        body: JSON.stringify({product_id}),
 
-      const result = await response.json();
-      
-      if (response.ok) {
-        imessage = result.message || "Added to wishlist";
-      } else {
-        message = result.message || "Failed to add to wishlist";
+      });
+      if (response.ok){
+        imessage = "Product added to wishlist!";
+        setTimeout(() =>(imessage = "", 1500));
+      } else{
+        message = "Failed to add to wishlist";
+        setTimeout(() =>(imessage = "", 1500));
+        
       }
+      
     } catch (error) {
-      message = "Network error occurred";
+      console.error("Error adding to wishlist", error);
+      message = "Error adding to wishlist";
+      setTimeout(() => (message = ""), 1500);
+      
     }
   }
+  
 </script>
 
 {#if imessage}
@@ -381,7 +362,7 @@
       {/if}
 
       <div class="xtra">
-        <button class="extra" on:click={() => addToWishlist()}>
+        <button class="extra" on:click={addToWishlist}>
           <span><Icon icon="ph:heart-thin" /></span>Add to wishlist
         </button>
         <button class="extra">

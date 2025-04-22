@@ -1,7 +1,6 @@
-export async function load({ params, fetch, parent }) {
+export async function load({ params, fetch }) {
   const { product_id } = params;
-  const { isAuthenticated, username } = await parent();
-  console.log("Page load:", { isAuthenticated, username, product_id });
+ 
 
   const API_URL = `http://127.0.0.1:8000/api/product/${product_id}/`;
 
@@ -13,24 +12,17 @@ export async function load({ params, fetch, parent }) {
     }
     const data = await response.json();
     const product = data.product || null;
-    let pendingWishlistItem = null;
-    if(isAuthenticated)
-    {
-        pendingWishlistItem = localStorage.getItem("wishlistPending");
-    }
+    
     return {
-      isAuthenticated,
-      username,
-      product,
-      pendingWishlistItem,
+    
+      product
+      
     };
   } catch (error) {
     console.error("Error loading product:", error);
     return {
       product: null,
-      isAuthenticated,
-      username,
-      pendingWishlistItem: null,
+     
     };
   }
 }

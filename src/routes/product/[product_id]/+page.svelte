@@ -8,16 +8,10 @@
   // Single data prop that contains everything
   export let data ;
 
-  onMount(() => {
-    console.log("Mounted with:", {
-      isAuthenticated: data.isAuthenticated,
-       pendingWishlistItem: data.pendingWishlistItem
-       
-    });
+ 
     
     
-    
-  });
+  
 
   $: if (data.product) {
     console.log("Product received:", data.product);
@@ -27,8 +21,7 @@
 {#if data.product}
   <Fullviewproduct 
     product={data.product} 
-    isAuthenticated={data.isAuthenticated} 
-    pendingWishlistItem={data.pendingWishlistItem} 
+  
   />
 {:else if data.product === null}
   <p>Product not found.</p>

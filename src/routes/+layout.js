@@ -1,50 +1,31 @@
-import { redirect } from '@sveltejs/kit';
+import { redirect } from "@sveltejs/kit";
+import { authStore } from "../stores/auth";
 
 export async function load({ url, fetch, depends }) {
-  depends('app:auth');
+  depends("app:auth");
 
   // Skip auth check during SSR
-  if (typeof window === 'undefined') {
-    return { isAuthenticated: false, username:null };
+  if (typeof window === "undefined") {
+    return { authState: { isAuthenticated: false, username: null } };
   }
-
-  const token = localStorage.getItem('authToken') || '';
   let isAuthenticated = false;
   let username = null;
 
-  async function validateToken() {
-    if (!token) return false;
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/user', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if(response.ok){
-        const data = await response.json();
-        username = data.username || null;
-        
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error validating token:', error);
-      return false;
-    }
-  }
-
-  isAuthenticated = await validateToken();
+  authStore.subscribe(({isAuthenticated:auth, username: name }) =>{
+    isAuthenticated = auth;
+    username = name;
+  }) ();
 
   const pathname = url.pathname;
-  const redirectParam = url.searchParams.get('redirect');
-  
+  const redirectParam = url.searchParams.get("redirect");
+
   // Only handle redirects in load function if authenticated
-  if (isAuthenticated && pathname === '/login') {
-    const target = redirectParam || '/account';
+  if (isAuthenticated && pathname === "/login") {
+    const target = redirectParam || "/account";
     throw redirect(307, target);
   }
 
-  return { isAuthenticated, username };
-  
+  return {
+    authState: { isAuthenticated, username },
+  };
 }

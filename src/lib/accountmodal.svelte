@@ -2,15 +2,19 @@
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
   import { update } from "lodash-es";
+  import { authStore, clearAuth } from "../stores/auth";
   let showModal = false;
   let dialog;
-  
 
+  let isAuthenticated = false;
+  let username = null;
 
-  export let isAuthenticated = false;
-  export let username = null;
+  authStore.subscribe(({ isAuthenticated: auth, username : name, isLoading }) => {
+    isAuthenticated = auth;
+    username = name || null;
+    
+  });
 
-  
   function openModal() {
     if (!showModal) {
       showModal = true;
@@ -30,8 +34,9 @@
   function navigateLogin() {
     goto("/login");
   }
-  function gotoAccount(){
-	goto("/login");
+  function gotoAccount() {
+    goto("/login");
+    closeModal();
   }
 </script>
 
@@ -47,11 +52,11 @@
   <div><Icon icon="line-md:account" style="height:25px; width:25px" /></div>
   <div class="ocon-t">
     {#if isAuthenticated && username}
-    {username}
+      {username}
     {:else if isAuthenticated}
-    Account
+      Account
     {:else}
-    Signup
+      Signup
     {/if}
   </div>
 </div>
@@ -65,41 +70,36 @@
   }}
   role
 >
-
   <div class="modal-content">
-	<div class="head">
-    <h2>My Account</h2>
-    <p class="subtext">Sign in for a more personalized experience</p>
-	</div>
+    <div class="head">
+      <h2>My Account</h2>
+      <p class="subtext">Sign in for a more personalized experience</p>
+    </div>
     <div class="auth-buttons">
       <button on:click={navigateLogin} class="log">Log In</button>
-      <button on:click={navigateToAccount} class="create">Create Account</button>
+      <button on:click={navigateToAccount} class="create">Create Account</button
+      >
     </div>
     <hr />
     <div class="menu-buttons">
       <div class="menu-t">
-        <div class = "menu-top">
-			<div><Icon icon="fluent-mdl2:activate-orders" /></div>
+        <div class="menu-top">
+          <div><Icon icon="fluent-mdl2:activate-orders" /></div>
           <button on:click={() => console.log("Orders")}>Orders</button>
-          
         </div>
         <div class="b">View and Track online or pickup Orders</div>
       </div>
       <div class="menu-t">
         <div class="menu-top">
-			<div><Icon icon="simple-line-icons:heart" /></div>
+          <div><Icon icon="simple-line-icons:heart" /></div>
           <button on:click={() => console.log("Favourites")}>Favourites</button>
-          
         </div>
         <div class="b">View saved products</div>
       </div>
       <div class="menu-t">
         <div class="menu-top">
-		<div><Icon icon="mdi:account-key-outline" /></div>
-          <button on:click={gotoAccount}
-            >Account</button
-          >
-          
+          <div><Icon icon="mdi:account-key-outline" /></div>
+          <button on:click={gotoAccount}>Account</button>
         </div>
         <div class="b">Payment, contactinfo, payment, address</div>
       </div>
@@ -138,10 +138,10 @@
     padding: 1em;
     display: flex;
     flex-direction: column;
-	gap: 7px;
+    gap: 7px;
   }
-  .head{
-	border-bottom: 1px solid gray;
+  .head {
+    border-bottom: 1px solid gray;
   }
 
   h2 {
@@ -157,21 +157,17 @@
     display: flex;
     gap: 30px;
     flex-direction: row;
-    
   }
-  .log{
-	width: 30%;
-	height: 40px;
-	background-color: rgb(26,72,69);
-	color: white;
-
+  .log {
+    width: 30%;
+    height: 40px;
+    background-color: rgb(26, 72, 69);
+    color: white;
   }
 
-  .create{
-	width: 60%;
-	height: 40px;
-
-
+  .create {
+    width: 60%;
+    height: 40px;
   }
   .menu-buttons {
     display: flex;
@@ -193,31 +189,28 @@
     align-self: start;
     padding: 0px;
   }
-  .menu-top{
-	display: flex;
-	flex-direction: row;
-	gap: 8px;
+  .menu-top {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
   }
-  .menu-top button{
-	color:rgb(26,72,69);
-	font-weight: 600;
+  .menu-top button {
+    color: rgb(26, 72, 69);
+    font-weight: 600;
   }
 
-  
-  .b{
-	font-size: 14px;
+  .b {
+    font-size: 14px;
     font-weight: 400;
     line-height: 16.94px;
     color: rgb(151, 151, 151);
-	margin-bottom: 3px;
-
+    margin-bottom: 3px;
   }
-  .close{
-	height: 40px;
-	background-color: rgb(26,72,69);
-	color: white;
-	font-weight: 700;
-
+  .close {
+    height: 40px;
+    background-color: rgb(26, 72, 69);
+    color: white;
+    font-weight: 700;
   }
 
   button:hover {
