@@ -6,7 +6,8 @@
   import { onMount, beforeUpdate } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
-  import { page } from "$app/navigation";
+  import {page} from "$app/stores";
+
   import Review from "./review.svelte";
   import {authStore} from "../stores/auth"
 
@@ -49,6 +50,9 @@
   let imessage;
   let isAuthenticated = false;
   let isLoading = true;
+  let wishlistimessage;
+  let wishlistmessage;
+
 
   authStore.subscribe(({isAuthenticated: auth}) =>{
     isAuthenticated = auth;
@@ -245,9 +249,11 @@
   }
   async function addToWishlist(){
     if(!isAuthenticated){
-      const redirectUrl = `/login?redirect =${encodeURIComponent($page.url.pathname)}`;
-      goto(redirectUrl);
+      sessionStorage.setItem("pendingWishlistAdd", product_id);
+      goto(`/login?redirect=/product/${product_id}`);
       return;
+      
+      
     }
     try {
       const token = localStorage.getItem("authToken");
@@ -261,18 +267,19 @@
 
       });
       if (response.ok){
-        imessage = "Product added to wishlist!";
-        setTimeout(() =>(imessage = "", 1500));
+        wishlistimessage= "Product  added to wishlist!";
+        setTimeout(() =>(wishlistimessage = "", 1500));
       } else{
-        message = "Failed to add to wishlist";
-        setTimeout(() =>(imessage = "", 1500));
+        wishlistmessage = "Failed to add to wishlist";
+        
+        setTimeout(() =>(wishlistimessage = "", 1500));
         
       }
       
     } catch (error) {
       console.error("Error adding to wishlist", error);
-      message = "Error adding to wishlist";
-      setTimeout(() => (message = ""), 1500);
+      wishlistmessage = "Error adding to wishlist";
+      setTimeout(() => (wishlistmessage = ""), 1500);
       
     }
   }
@@ -282,8 +289,14 @@
 {#if imessage}
   <div class="imessage">{imessage}</div>
 {/if}
+{#if wishlistimessage}
+<div class="imessage">{wishlistimessage}</div>
+{/if}
 {#if message}
   <div class="stockermessage">{message}</div>
+{/if}
+{#if wishlistmessage}
+<div class="stockermessage">{wishlistmessage}</div>
 {/if}
 
 {#if product && product.product_id}

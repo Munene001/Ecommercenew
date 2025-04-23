@@ -1,9 +1,7 @@
 <script>
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
-  
-  
-  
+
   import Icon from "@iconify/svelte";
   import { initializeAuth } from "../../stores/auth";
 
@@ -41,8 +39,33 @@
         const data = await response.json();
         if (browser) {
           localStorage.setItem("authToken", data.token);
-          initializeAuth(data.token, data.username)
-          sessionStorage.removeItem('originalRedirect');
+          initializeAuth(data.token, data.username);
+
+          const pendingProductId = sessionStorage.getItem("pendingWishlistAdd");
+          if (pendingProductId) {
+            try {
+              const wishlistResponse = await fetch(
+                `http://127.0.0.1:8000/api/wishlist`,
+                {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${data.token}`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ product_id: pendingProductId }),
+                }
+              );
+              if (wishlistResponse.ok) {
+                console.log(
+                  "Product automatically added to wishlist after login"
+                );
+              }
+            } catch (error) {
+              console.error("Failed to add pending wishlist item", error);
+            }
+            sessionStorage.removeItem("pendingWishlistAdd");
+          }
+          sessionStorage.removeItem("originalRedirect");
           const target = redirectTo.startsWith("/") ? redirectTo : "/account";
           if (redirectTo) {
             sessionStorage.setItem("originalRedirect", redirectTo);
@@ -58,7 +81,6 @@
     }
   }
 </script>
-
 
 <div class="container">
   <div class="template">
@@ -102,7 +124,10 @@
         <p style="color: red;" class="error">{errorMessage}</p>
       {/if}
       <div class="signup">
-        Dont have an account?<a href={`/register?redirect=${encodeURIComponent(redirectTo)}`} aria-label="register">
+        Dont have an account?<a
+          href={`/register?redirect=${encodeURIComponent(redirectTo)}`}
+          aria-label="register"
+        >
           Sign Up</a
         >
       </div>
@@ -115,9 +140,6 @@
     </div>
   </div>
 </div>
-
-
-
 
 <style>
   .container {

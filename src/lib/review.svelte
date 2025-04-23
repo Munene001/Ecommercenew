@@ -3,6 +3,8 @@
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import Icon from "@iconify/svelte";
+  import {authStore} from  "../stores/auth";
+
 
   export let product_id;
   export let average_rating;
@@ -16,6 +18,16 @@
   let submitting = false;
   let submittingReply = {};
   let activeTab = "";
+  let isAuthenticated = false;
+  let username = null;
+
+  authStore.subscribe(({isAuthenticated: auth, username :name}) =>{
+    isAuthenticated = auth;
+    username = name;
+
+  });
+
+
 
   function toggleReplies(review_id) {
     if (activeTab === review_id) {
@@ -42,7 +54,7 @@
   });
 
   async function submitReview() {
-    if (!$page.data.isAuthenticated) {
+    if (!isAuthenticated) {
       goto("/login?redirect = /product/${product_id}");
       return;
     }
@@ -75,7 +87,7 @@
   }
 
   async function submitReply(review_id) {
-    if (!$page.data.isAuthenticated) {
+    if (!isAuthenticated) {
       goto("/login?redirect = /product/${product_id}");
       return;
     }
@@ -235,7 +247,7 @@
               </div>
             {/if}
 
-            {#if $page.data.isAuthenticated}
+            {#if isAuthenticated}
               <form
                 on:submit|preventDefault={() => submitReply(review.review_id)}
               >
@@ -268,7 +280,7 @@
   </div>
 
   <!-- Review submission form moved down -->
-  {#if $page.data.isAuthenticated}
+  {#if isAuthenticated}
     <form on:submit|preventDefault={submitReview}>
       <h3>Write a Review</h3>
       <label>

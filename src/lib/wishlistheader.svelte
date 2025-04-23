@@ -19,9 +19,9 @@
     }
   </script>
   
-  <div class="wishlist" onclick={navigateToWishlist} role aria-label="wishlist">
+  <div class="wishlist"  aria-label="wishlist">
  
-     <div ><Icon icon= "simple-line-icons:heart" style="height:25px; width:25px" /></div>
+     <div class="icon"  onclick={navigateToWishlist} role><Icon icon= "simple-line-icons:heart" style="height:25px; width:25px" /></div>
      
     
       
@@ -34,6 +34,9 @@
       flex-direction: column;
       cursor: pointer;
       position: relative;
+    }
+    .icon{
+      cursor: pointer;
     }
   
     

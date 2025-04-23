@@ -190,6 +190,7 @@
     gap: 10px;
     align-items: flex-start;
     padding: 20px 0px;
+    cursor: pointer;
   }
   .nonhead {
     display: flex;
