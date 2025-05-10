@@ -383,7 +383,8 @@
     display: flex;
     flex-direction: row;
     background-color: whitesmoke;
-    height: 50px;
+    border: 1px solid rgb(243, 239, 239);
+    height: 60px;
   }
   .resultimg {
     flex: 7%;

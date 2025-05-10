@@ -4,8 +4,8 @@
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
   import Cartadd from "../../lib/cartadd.svelte";
-  
-  import {openProductPage} from "../../lib/productutil.js";
+
+  import { openProductPage } from "../../lib/productutil.js";
 
   let cart = [];
   let products = [];
@@ -175,11 +175,7 @@
       }
     };
   });
-
- 
 </script>
-
-
 
 {#if error}
   <div class="error-message">{error}</div>
@@ -190,92 +186,104 @@
     {msg.text}
   </div>
 {/each}
-<div class="cart-page" >
-  
-
-<div class="cart-uno">
-  <h1>Your Cart</h1>
-  {#if cart.length === 0}
-    <p>Your cart is empty.</p>
-    <button class="continue-shopping" on:click={() => goto("/products")}>
-      Continue Shopping
-    </button>
-  {:else}
-    <div class="cart-items">
-      {#each products as product (product.product_id + product.size_id)}
-        <div class="cart-item" >
-          <div class="item-image"  on:click={openProductPage(product.product_id)} role>
-            <img
-              src={product.images[0]?.imageurl || "/fallback-image.jpg"}
-              alt={product.productname || "Product"}
-              loading="lazy"
-            />
-          </div>
-          <div class="item-details">
-            <h2  on:click={openProductPage(product.product_id)} role>{product.productname || "Unknown Product"}</h2>
-            <p>Size: {product.size}</p>
-            <p>
-              Price: ${product.discountprice || product.price || 0}
-              {#if product.discountprice}
-                <span class="original-price">${product.price || 0}</span>
-              {/if}
-            </p>
-            <div class="quantity-control">
-              <button
-                on:click={() =>
-                  updateQuantity(product.product_id, product.size_id, -1)}
-                disabled={product.quantity <= 1}
-                aria-label="Decrease quantity"
-              >
-                <Icon icon="mdi:minus" />
-              </button>
-              <span>{product.quantity}</span>
-              <button
-                on:click={() =>
-                  updateQuantity(product.product_id, product.size_id, 1)}
-                disabled={product.quantity >= product.stock_quantity}
-                aria-label="Increase quantity"
-              >
-                <Icon icon="mdi:plus" />
-              </button>
-            </div>
-            <button
-              class="remove-btn"
-              on:click={() => removeItem(product.product_id, product.size_id)}
-              aria-label="Remove item"
-            >
-              <Icon icon="mdi:trash-can-outline" /> Remove
-            </button>
-          </div>
-        </div>
-      {/each}
-    </div>
-    {/if}
-    </div>
-    
-    <div class="cart-summary">
-      <h3>Summary</h3>
-      <p>Total Items: {totalItems}</p>
-      <p>Total Price: ${(totalPrice || 0).toFixed(2)}</p>
-      <button
-        on:click={proceedToCheckout}
-        disabled={totalItems === 0}
-        aria-label="Proceed to checkout"
-      >
-        Proceed to Checkout
-      </button>
-      <button
-        class="continue-shopping"
-        on:click={() => goto("/products")}
-        aria-label="Continue shopping"
-      >
+<div class="cart-page">
+  <div class="cart-uno">
+    <h1>Your Cart</h1>
+    {#if cart.length === 0}
+      <p>Your cart is empty.</p>
+      <button class="continue-shopping" on:click={() => goto("/products")}>
         Continue Shopping
       </button>
-    </div>
-  
+    {:else}
+      <div class="cart-items">
+        {#each products as product (product.product_id + product.size_id)}
+          <div class="item-details">
+            <div
+              class="item-image"
+              on:click={openProductPage(product.product_id)}
+              role
+            >
+              <img
+                src={product.images[0]?.imageurl || "/fallback-image.jpg"}
+                alt={product.productname || "Product"}
+                loading="lazy"
+              />
+            </div>
 
+            <div class="productname">
+              <span on:click={openProductPage(product.product_id)} role
+                >{product.productname || "Unknown Product"}</span
+              >
+              <p>Size: {product.size}</p>
+            </div>
+            <div class="productprice">
+              <p>
+                Price: ksh:{product.discountprice || product.price || 0}
+                {#if product.discountprice}
+                  <span class="original-price">${product.price || 0}</span>
+                {/if}
+              </p>
+            </div>
+            <div class="quantity-control">
+              <div>
+                <button
+                  on:click={() =>
+                    updateQuantity(product.product_id, product.size_id, -1)}
+                  disabled={product.quantity <= 1}
+                  aria-label="Decrease quantity"
+                >
+                  <Icon icon="mdi:minus" />
+                </button>
+                <span>{product.quantity}</span>
+                <button
+                  on:click={() =>
+                    updateQuantity(product.product_id, product.size_id, 1)}
+                  disabled={product.quantity >= product.stock_quantity}
+                  aria-label="Increase quantity"
+                >
+                  <Icon icon="mdi:plus" />
+                </button>
+              </div>
+
+              <div class="delete">
+                <button
+                  class="remove-btn"
+                  on:click={() =>
+                    removeItem(product.product_id, product.size_id)}
+                  aria-label="Remove item"
+                >
+                  <Icon icon="mdi:trash-can-outline" /> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
+
+  <div class="cart-summary">
+    <h3>Summary</h3>
+    <p>Total Items: {totalItems}</p>
+    <p>Total Price: ksh: {(totalPrice || 0).toFixed(2)}</p>
+    <button
+      on:click={proceedToCheckout}
+      disabled={totalItems === 0}
+      aria-label="Proceed to checkout"
+      class="summarybutton"
+    >
+      Proceed to Checkout
+    </button>
+    <button
+      class="summarybutton"
+      on:click={() => goto("/products")}
+      aria-label="Continue shopping"
+      
+     >
+      Continue Shopping
+    </button>
+  </div>
 </div>
-
 
 <style>
   .cart-page {
@@ -285,25 +293,20 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    
-    
   }
-  .cart-uno{
-    flex:  0 0 60%;
+  .cart-uno {
+    flex: 0 0 70%;
+  }
 
-  }
   .cart-items {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    
   }
-  .cart-item {
-    display: flex;
-    gap: 20px;
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 20px;
+  .item-image {
+    flex: 0 0 15%;
   }
+
   .item-image img {
     width: 100px;
     height: 100px;
@@ -312,16 +315,33 @@
     border-radius: 4px;
   }
   .item-details {
-    flex: 1;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex: 1;
+    align-items: center;
+    border-bottom: 1px solid gray;
   }
-  .item-details h2 {
-    font-size: 20px;
-    margin: 0;
-    color: #333;
+  .productname {
+    flex: 0 0 25%;
+   
   }
+  .productname span {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: rgb(33, 37, 41);
+    font-weight: 600;
+  }
+  .productprice {
+    flex: 0 0 25%;
+    
+font-weight:600;
+
+  }
+  .delete {
+    flex: 0 0 5%;
+  }
+
+  
   .item-details p {
     margin: 0;
     color: #555;
@@ -331,8 +351,11 @@
     color: #888;
     margin-left: 10px;
     font-size: 14px;
+    
+    
   }
   .quantity-control {
+    flex: 0 0 30%;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -345,6 +368,7 @@
     border-radius: 4px;
     font-size: 16px;
     line-height: 1;
+    font-weight: 600;
   }
   .quantity-control button:disabled {
     opacity: 0.5;
@@ -358,7 +382,7 @@
   .remove-btn {
     background: none;
     border: none;
-    color: #d32f2f;
+    color: orangered;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -378,9 +402,8 @@
     flex-direction: column;
     gap: 10px;
     background: #fafafa;
-    flex: 0 0 30%;
+    flex: 0 0 25%;
     align-self: flex-start;
-    
   }
   .cart-summary h3 {
     margin: 0;
@@ -392,13 +415,14 @@
     color: #555;
   }
   .cart-summary button {
-    background: #000;
+    background:orangered;
     color: #fff;
     padding: 10px;
     border: none;
     cursor: pointer;
     border-radius: 4px;
     font-size: 16px;
+    font-weight: 600;
   }
   .cart-summary button:disabled {
     opacity: 0.5;
@@ -412,6 +436,7 @@
   .continue-shopping:hover {
     background: #f5f5f5;
   }
+ 
   .error-message {
     background: #ff4500;
     color: #fff;
@@ -439,14 +464,27 @@
     box-sizing: border-box;
   }
   @media (max-width: 768px) {
-    .cart-item {
+    .cart-page{
+      display: flex;
       flex-direction: column;
-      align-items: flex-start;
     }
-    .item-image img {
-      width: 80px;
-      height: 80px;
+   
+    .item-image {
+      display: none;
     }
+  .productname{
+    flex: 0 0 35%;
+  }
+  .productprice{
+    flex: 0 0 35%;
+  }
+  .delete{
+    display: none;
+  }
+  .quantity-control{
+    flex: 0 0 35%;
+  }
+   
     .cart-page {
       padding: 10px;
     }

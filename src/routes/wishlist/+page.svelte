@@ -117,7 +117,7 @@
     <p>Loading wishlist...</p>
   {:else if !isAuthenticated}
     <p>{message}</p>
-    <button class="login-btn" on:click={() => goto("/login")}> Log In </button>
+    <button class="login-btn" on:click={() => goto(`/login?redirect=/wishlist`)}> Log In </button>
   {:else if wishlist.length === 0}
     <p>Your wishlist is empty.</p>
     <button class="continue-shopping" on:click={() => goto("/products")}>
@@ -159,6 +159,7 @@
                 >
               {/if}
             </p>
+            
             <button
               class="remove-btn"
               on:click={() => removeItem(product.product_id)}

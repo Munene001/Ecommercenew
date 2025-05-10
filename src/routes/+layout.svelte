@@ -23,9 +23,7 @@
 <Header/>
 
 <slot {showNavigation}/>
-{#if showNavigation}
-<Navigationbar/>
-{/if}
+
 
 <Prefooter/>
 <Footer/>

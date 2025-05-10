@@ -6,10 +6,10 @@
   import { onMount, beforeUpdate } from "svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
-  import {page} from "$app/stores";
+  import { page } from "$app/stores";
 
   import Review from "./review.svelte";
-  import {authStore} from "../stores/auth"
+  import { authStore } from "../stores/auth";
 
   export let product = {
     productname: "",
@@ -38,7 +38,6 @@
     review_count,
     average_rating,
   } = product;
- 
 
   let currentIndex = 0;
   let activeTab = "desc";
@@ -53,11 +52,9 @@
   let wishlistimessage;
   let wishlistmessage;
 
-
-  authStore.subscribe(({isAuthenticated: auth}) =>{
+  authStore.subscribe(({ isAuthenticated: auth }) => {
     isAuthenticated = auth;
   });
- 
 
   // Safe cart access
   function getCart() {
@@ -247,56 +244,43 @@
       window.dispatchEvent(new Event("cartUpdated"));
     }
   }
-  async function addToWishlist(){
-    if(!isAuthenticated){
+  $: wishlistimessage, wishlistmessage;
+  async function addToWishlist() {
+    if (!isAuthenticated) {
       sessionStorage.setItem("pendingWishlistAdd", product_id);
       goto(`/login?redirect=/product/${product_id}`);
       return;
-      
-      
     }
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch ("http://127.0.0.1:8000/api/wishlist",{
+      const response = await fetch("http://127.0.0.1:8000/api/wishlist", {
         method: "POST",
-        headers:{
+        headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({product_id}),
-
+        body: JSON.stringify({ product_id }),
       });
-      if (response.ok){
-        wishlistimessage= "Product  added to wishlist!";
-        setTimeout(() =>(wishlistimessage = "", 1500));
-      } else{
+      if (response.ok) {
+        wishlistimessage = "Product  added to wishlist!";
+        setTimeout(() => (wishlistimessage = ""), 1500);
+      } else {
         wishlistmessage = "Failed to add to wishlist";
-        
-        setTimeout(() =>(wishlistimessage = "", 1500));
-        
+
+        setTimeout(() => (wishlistimessage = ""), 1500);
       }
-      
     } catch (error) {
       console.error("Error adding to wishlist", error);
       wishlistmessage = "Error adding to wishlist";
       setTimeout(() => (wishlistmessage = ""), 1500);
-      
     }
   }
-  
 </script>
 
 {#if imessage}
   <div class="imessage">{imessage}</div>
-{/if}
-{#if wishlistimessage}
-<div class="imessage">{wishlistimessage}</div>
-{/if}
-{#if message}
+{:else if message}
   <div class="stockermessage">{message}</div>
-{/if}
-{#if wishlistmessage}
-<div class="stockermessage">{wishlistmessage}</div>
 {/if}
 
 {#if product && product.product_id}
@@ -373,15 +357,21 @@
           <button class="incart" on:click={openModal}>Add to Cart</button>
         </div>
       {/if}
-
-      <div class="xtra">
-        <button class="extra" on:click={addToWishlist}>
-          <span><Icon icon="ph:heart-thin" /></span>Add to wishlist
-        </button>
-        <button class="extra">
-          <span><Icon icon="material-symbols-light:share-outline" /></span>Share
-          Product
-        </button>
+      <div class="abovextra">
+        <div class="xtra">
+          <button class="extra" on:click={addToWishlist}>
+            <span><Icon icon="ph:heart-thin" /></span>Add to wishlist
+          </button>
+          <button class="extra">
+            <span><Icon icon="material-symbols-light:share-outline" /></span
+            >Share Product
+          </button>
+        </div>
+        {#if wishlistimessage}
+          <div class="wishlistimessage">{wishlistimessage}</div>
+        {:else if wishlistmessage}
+          <div class="wishlistmessage">{wishlistmessage}</div>
+        {/if}
       </div>
     </div>
     <div class="farleft"><Recentlyview currentProduct={product} /></div>
@@ -620,12 +610,25 @@
     padding: 15px 99px;
     font-size: 14px;
   }
+  .abovextra {
+    border-bottom: 1px solid lightgray;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+  }
+  .wishlistimessage{
+   
+    color: green;
+  }
+  .wishlistmessage{
+    color: orangered;
+  }
   .xtra {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    border-bottom: 1px solid lightgray;
-    padding-bottom: 40px;
   }
   .extra {
     display: flex;

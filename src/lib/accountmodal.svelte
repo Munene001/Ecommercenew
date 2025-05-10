@@ -14,6 +14,7 @@
     username = name || null;
     
   });
+  
 
   function openModal() {
     if (!showModal) {
@@ -96,10 +97,10 @@
         </div>
         <div class="b">View saved products</div>
       </div>
-      <div class="menu-t">
+      <div class="menu-t"  on:click={gotoAccount} role>
         <div class="menu-top">
           <div><Icon icon="mdi:account-key-outline" /></div>
-          <button on:click={gotoAccount}>Account</button>
+          <button>Account</button>
         </div>
         <div class="b">Payment, contactinfo, payment, address</div>
       </div>
@@ -180,6 +181,7 @@
     flex-direction: column;
     border-bottom: 1px solid gray;
     gap: 7px;
+    cursor: pointer;
   }
 
   .menu-t button {
